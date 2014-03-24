@@ -4,7 +4,7 @@ public class Elevator
 {
 	
 	private static final int	MAX_DISPLACEMENT = 100;
-	private static final int	STOP_TIME = 60;
+	private static final int	STOP_TIME = 130;
 	public enum 		Direction {UP, DOWN};
 	
 	private Elevator[]	elevators;
@@ -114,10 +114,13 @@ public class Elevator
 				if (currentDirection == Direction.UP)
 				{
 					//Take everyone onto the elevator from this floor who wants to go up
-					System.out.println("About to call goingup with: "+Arrays.toString(guests));
+					System.out.println("About to call goingup with: "+Arrays.toString(guests)+" on elevator");
+					System.out.println("On current floor: "+Arrays.toString(floors[currentFloor].getGuests()));
 					floors[currentFloor].takeGuestsGoingUp(guests);
-					System.out.println("Out of goingup: "+Arrays.toString(guests));
-					System.out.println(Arrays.toString(lights));
+					System.out.println("Now on elevator: "+Arrays.toString(guests));
+					System.out.println("Now on current floor: "+Arrays.toString(floors[currentFloor].getGuests()));
+					System.out.println("Lights on current elevator: "+Arrays.toString(lights));
+					System.out.println();
 				}
 				else
 				{
