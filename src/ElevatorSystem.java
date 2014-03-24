@@ -7,13 +7,13 @@ import java.util.Random;
 public class ElevatorSystem extends JFrame
 {
 	private static final long	serialVersionUID = 1L;
-	private static final int	NUM_ELEVATORS = 4;
+	private static final int	NUM_ELEVATORS = 6;
 	private static final int	NUM_FLOORS = 6;
 	
 	public static void main(String[] args)
 	{
 		ElevatorSystem theApp = new ElevatorSystem();
-		ElevatorGUI theGUI = new ElevatorGUI( NUM_ELEVATORS, NUM_FLOORS );
+		ElevatorGUI theGUI = new ElevatorGUI( NUM_FLOORS, NUM_ELEVATORS );
 		theApp.setContentPane(theGUI);
 		theApp.setSize(theGUI.getSize());
 		theApp.setResizable(false);
@@ -99,7 +99,7 @@ class ElevatorGUI extends Container
 		//Redraw floors...
 		for(int i = 0; i < floors.length; i++)
 		{
-			g.drawString(Arrays.toString(floors[i].getGuests()), 10, (i * ELEVATOR_HEIGHT)+10);
+			g.drawString(Arrays.toString(floors[i].getGuests()), 10, getHeight() - (i * ELEVATOR_HEIGHT) - 10);
 			Random r = new Random();
 			if (r.nextInt(100) % 51 == 0)
 			{
