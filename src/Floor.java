@@ -10,11 +10,6 @@ public class Floor
 	 */
 	private static final int	MAX_PER_DESTINATION = 5;
 	/**
-	 * The percent chance that a call to generateGuests() will actually generate any guests.
-	 * Precise only to tenths place.
-	 */
-	private static final double	GUEST_GENERATION_ODDS_PERCENT = 0.3;
-	/**
 	 * The total number of floors in the system.
 	 */
 	private int			numberOfFloors;
@@ -46,8 +41,6 @@ public class Floor
 		
 		guests = new int[numberOfFloors];
 		generateGuests();
-
-		System.out.println();
 	}
 	
 	public int[] getGuests()
@@ -68,7 +61,6 @@ public class Floor
 			guestsGoingUp[i] += guests[i];
 			guests[i] = 0;
 		}
-		System.out.println("TakeGuestsGoingUp");
 	}
 	/**
 	 * Puts all guests from this floor who want to go down into the array provided.
@@ -92,8 +84,6 @@ public class Floor
 	 */
 	public void generateGuests()
 	{
-		if ( rand.nextInt(1000) > ((10*GUEST_GENERATION_ODDS_PERCENT)-1) )
-			return;
 		for(int i = 0; i < numberOfFloors; i++)
 		{
 			if (i != id)
@@ -116,7 +106,6 @@ public class Floor
 			up += guests[i];
 		
 		Elevator.Direction result = (up > down ? Elevator.Direction.UP : Elevator.Direction.DOWN);
-		//System.out.println("DirectionPreference: "+result);
 		return result;
 	}
 	
