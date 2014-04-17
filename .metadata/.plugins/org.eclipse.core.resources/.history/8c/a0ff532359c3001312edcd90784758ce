@@ -1,0 +1,23 @@
+
+public class Guest {
+	
+	GuestSpace place;
+	
+	public void callElevator() {
+		
+	}
+	
+	//Move the guest from current GuestSpace to destination GuestSpace
+	public void enterSpace(GuestSpace destination) {
+		if (place.adjacentSpace.contains(destination)) {
+			place.guests.remove(this);
+			destination.guests.add(this);
+			place = destination;
+		}
+		else { 
+			System.out.println("Error in program.  Cannot move between non-adjacent spaaces.");
+			System.exit(0);
+		}
+	}
+	
+}

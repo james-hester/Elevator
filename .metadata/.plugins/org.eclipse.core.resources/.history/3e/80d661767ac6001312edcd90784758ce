@@ -1,0 +1,29 @@
+import java.util.ArrayList;
+
+
+public class Building {
+	
+	private static ArrayList<Elevator> elevators;
+	private static ArrayList<Floor> floors;
+	private static LiftOperator control;
+	
+	//Constructor for Building
+	public Building(ArrayList<Elevator> elevators, ArrayList<Floor> floors, LiftOperator control) {
+		Building.elevators = elevators;
+		Building.floors = floors;
+		Building.control = control;
+	}
+	
+	public static ArrayList<Elevator> getElevators() {
+		return elevators;
+	}
+	
+	public static ArrayList<Floor> getFloors() {
+		return floors;
+	}
+	
+	public static LiftOperator getOperator() {
+		return control;
+	}
+	
+}

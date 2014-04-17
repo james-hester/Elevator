@@ -1,0 +1,22 @@
+import java.util.ArrayList;
+
+
+public class World {
+	
+	static ArrayList<GuestSpace> guestSpaces = new ArrayList<GuestSpace>();
+	static ArrayList<Steppable> steppables = new ArrayList<Steppable>();
+	private static LiftOperator control = new TestAI();
+	static Building building = new Building(control);
+	static boolean running = true;
+	
+	public static Building getBuilding() {
+		return building;
+	}
+	
+	public static void main (String[] args) {
+		while (World.running) {
+			step();
+		}
+	}
+	
+}

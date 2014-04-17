@@ -1,0 +1,7 @@
+
+public class Elevator extends GuestSpace {
+
+	public static enum DIRECTION {UP, DOWN};
+	double speed;
+	
+}

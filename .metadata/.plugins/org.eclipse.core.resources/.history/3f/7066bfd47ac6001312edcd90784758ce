@@ -1,0 +1,17 @@
+import java.util.ArrayList;
+
+
+public class World {
+	
+	static ArrayList<GuestSpace> guestSpaces = new ArrayList<GuestSpace>();
+	static ArrayList<Steppable> steppables = new ArrayList<Steppable>();
+	Building building;
+	
+	public World() {
+		ArrayList<Elevator> elevators = new ArrayList<Elevator>();
+		ArrayList<Floor> floors = new ArrayList<Floor>();
+		LiftOperator control = new TestAI();
+		building = new Building(elevators, floors, control);
+	}
+	
+}

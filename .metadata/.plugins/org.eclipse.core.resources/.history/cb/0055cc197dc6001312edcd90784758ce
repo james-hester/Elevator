@@ -1,0 +1,26 @@
+import java.util.ArrayList;
+
+
+public class World {
+	
+	static ArrayList<GuestSpace> guestSpaces = new ArrayList<GuestSpace>();
+	static ArrayList<Steppable> steppables = new ArrayList<Steppable>();
+	private static ArrayList<Elevator> elevators = new ArrayList<Elevator>();
+	private static ArrayList<Floor> floors = new ArrayList<Floor>();
+	private static LiftOperator control = new TestAI();
+	static Building building = new Building(elevators, floors, control);
+	
+	public static Building getBuilding() {
+		return building;
+	}
+	
+	public static void main (String[] args) {
+		World.getBuilding().getElevators().add(new Elevator());
+		System.out.println(World.getBuilding().getElevators().get(0).getLocation());
+		World.getBuilding().getElevators().get(0).setState(Elevator.DIRECTION.UP);
+		for (Steppable x : steppables)
+			x.step();
+		System.out.println(World.getBuilding().getElevators().get(0).getLocation());
+	}
+	
+}

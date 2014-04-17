@@ -1,0 +1,42 @@
+import java.util.ArrayList;
+
+
+public abstract class LiftOperator implements Steppable {
+	
+	ArrayList<Floor> elevatorCalls;
+	ArrayList<Elevator> elevators;
+	
+	public abstract void callElevator(Floor floor, Elevator.DIRECTION direction);
+	public abstract void step();
+	
+	public double distanceFromFloor(Floor floor, Elevator elevator) {
+		Floor pointer = null;
+		double height = 0;
+		int i = 0;
+		do {
+			if (pointer != null)
+				height += pointer.getHeight();
+			pointer = Building.getFloors().get(i);
+			i++;
+		} while (pointer != floor);
+		return Math.abs(height-elevator.getLocation());
+	}
+	
+	public Floor getFloor(Elevator elevator) {
+		int height = 0;
+		int i = 0;
+		while (height < elevator.getLocation() && i < Building.getFloors().size()) {
+			height += Building.getFloors().get(i).getHeight();
+			i++;
+		}
+		if (height-elevator.getLocation() == 0) {
+			return Building.getFloors().get(i-1);
+		}
+		else return null;
+	}
+	
+	public void setElevatorState(Elevator.DIRECTION direction, Elevator elevator) {
+		elevator.setState(direction);
+	}
+	
+}

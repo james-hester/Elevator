@@ -1,0 +1,9 @@
+import java.util.ArrayList;
+
+
+public class World {
+	
+	static ArrayList<GuestSpace> guestSpaces = new ArrayList<GuestSpace>();
+	static ArrayList<Steppable> steppables = new ArrayList<Steppable>();
+	
+}

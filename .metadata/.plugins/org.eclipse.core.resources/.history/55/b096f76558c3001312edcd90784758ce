@@ -1,0 +1,18 @@
+
+public class Guest {
+	
+	GuestSpace place;
+	
+	public void callElevator() {
+		
+	}
+	
+	public void enterSpace() {
+		
+	}
+	
+	public void exitSpace() {
+		
+	}
+	
+}

@@ -1,0 +1,19 @@
+import java.util.ArrayList;
+
+
+public class GuestSpace {
+	
+	static ArrayList<GuestSpace> guestSpaces = new ArrayList<GuestSpace>();
+	
+	ArrayList<GuestSpace> adjacentSpace;
+	ArrayList<Guest> guests;
+	
+	public GuestSpace() {
+		guestSpaces.add(this);
+	}
+	
+	public ArrayList<Guest> getGuests() {
+		return guests;
+	}
+
+}

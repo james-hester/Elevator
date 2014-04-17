@@ -1,0 +1,13 @@
+import java.util.ArrayList;
+
+
+public class GuestSpace {
+	
+	ArrayList<GuestSpace> adjacentSpace;
+	ArrayList<Guest> guests;
+	
+	public ArrayList<Guest> getGuests() {
+		return guests;
+	}
+
+}

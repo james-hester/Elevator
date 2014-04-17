@@ -1,0 +1,38 @@
+
+public class Elevator extends GuestSpace implements Steppable {
+
+	public static enum DIRECTION {UP, DOWN};
+	double speed;	//Number of steps to move 1 unit
+	double location;  //Height in the elevator shaft
+	boolean doorsOpen;
+	
+	public Floor getFloor() {
+		int height = 0;
+		int i = 0;
+		while (height < location && i < Building.getFloors().size()) {
+			height += Building.getFloors().get(i).getHeight();
+			i++;
+		}
+		if (height-location == 0) {
+			return Building.getFloors().get(i-1);
+		}
+		else return null;
+	}
+	
+	public double distanceFromFloor(Floor floor) {
+		Floor pointer = null;
+		double height = 0;
+		int i = 0;
+		do {
+			if (pointer != null)
+				height += pointer.getHeight();
+			pointer = Building.getFloors().get(i);
+			i++;
+		} while (pointer != floor);
+		return height;
+	}
+	
+	public void step() {
+		
+	}
+}

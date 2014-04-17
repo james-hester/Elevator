@@ -1,0 +1,6 @@
+
+public abstract class LiftOperator {
+	
+	public abstract void callElevator(Floor floor, Elevator.DIRECTION direction);
+	
+}

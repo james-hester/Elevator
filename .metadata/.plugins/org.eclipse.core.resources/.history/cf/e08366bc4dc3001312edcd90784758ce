@@ -1,0 +1,10 @@
+import java.util.ArrayList;
+
+
+public class Elevator extends GuestSpace {
+
+	public static enum DIRECTION {UP, DOWN};
+	double speed;
+	ArrayList<Guest> guests;
+	
+}

@@ -1,0 +1,19 @@
+
+public class Elevator extends GuestSpace implements Steppable {
+
+	public static enum DIRECTION {INACTIVE, UP, DOWN};
+	double speed;	//Number of steps to move 1 unit
+	double location;  //Height in the elevator shaft
+	boolean doorsOpen;
+	DIRECTION direction;
+	
+	public void move () {
+		if (direction == DIRECTION.UP && )
+			
+	}
+	
+	public void step() {
+		if (direction == DIRECTION.INACTIVE)
+			
+	}
+}
