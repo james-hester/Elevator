@@ -1,7 +1,0 @@
-
-public class Elevator extends GuestSpace implements Steppable {
-
-	public static enum DIRECTION {UP, DOWN};
-	double speed;
-	double location;  //Height in the elevator shaft
-}

@@ -1,0 +1,15 @@
+import java.util.Queue;
+
+
+public class TestAI extends LiftOperator {
+	
+	Queue<ElevatorCall> calls;
+
+	public void step() {
+		for (ElevatorCall e : elevatorCalls) {
+			calls.add(e);
+			elevatorCalls.remove(e);
+		}
+	}
+
+}

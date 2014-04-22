@@ -1,0 +1,28 @@
+
+public class Floor extends GuestSpace implements Comparable<Floor> {
+	
+	static Integer FLOOR = 0;
+	double height;
+	int floor;
+	
+	public Floor() {
+		height = 12;
+		floor = FLOOR.intValue();
+		FLOOR++;
+	}
+	
+	public Floor(int height) {
+		this.height = height;
+		floor = FLOOR.intValue();
+		FLOOR++;
+	}
+	
+	public double getHeight() {
+		return height*floor;
+	}
+	
+	public int compareTo(Floor floor) {
+		return this.getHeight()-floor.getHeight();
+	}
+
+}

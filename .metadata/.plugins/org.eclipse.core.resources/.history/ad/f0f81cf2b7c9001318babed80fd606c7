@@ -1,0 +1,43 @@
+import java.util.ArrayList;
+
+
+public class Elevator extends GuestSpace implements Steppable {
+
+	public static enum DIRECTION {INACTIVE, UP, DOWN};
+	private int speed;	//Number of steps to move 1 unit
+	private double location;  //Height in the elevator shaft
+	private boolean doorsOpen;
+	DIRECTION direction;
+	
+	public Elevator() {
+		World.steppables.add(this);
+		speed = 1;
+	}
+	
+	public double getLocation() {
+		return location;
+	}
+	
+	public void setState(DIRECTION direction) {
+		this.direction = direction;
+	}
+	
+	public void toggleDoors() {
+		if (!doorsOpen)
+			doorsOpen = true;
+		else doorsOpen = false;
+	}
+	
+	public void move () {
+		if (direction == DIRECTION.UP)
+			location += 1.0/speed;
+		else if (direction == DIRECTION.DOWN)
+			location -= 1.0/speed;
+	}
+	
+	public void step() {
+		move();
+		if (direction != DIRECTION.INACTIVE)
+			adjacentSpace.clear();
+	}
+}

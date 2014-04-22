@@ -1,0 +1,29 @@
+
+public class Guest implements Steppable {
+	
+	GuestSpace place;
+	GuestSpace finalDestination;
+	
+	public void callElevator(Elevator.DIRECTION direction) {
+		if (place instanceof Floor)
+			World.getBuilding().getOperator().callElevator((Floor)place, direction);
+	}
+	
+	//Move the guest from current GuestSpace to destination GuestSpace
+	public void enterSpace(GuestSpace destination) {
+		if (place.adjacentSpace.contains(destination)) {
+			place.guests.remove(this);
+			destination.guests.add(this);
+			place = destination;
+		}
+		else { 
+			System.out.println("Error in program.  Cannot move between non-adjacent spaces.");
+			System.exit(0);
+		}
+	}
+	
+	public void step() {
+		
+	}
+	
+}

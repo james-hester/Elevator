@@ -1,0 +1,22 @@
+import java.util.LinkedList;
+import java.util.Queue;
+
+
+public class TestAI extends LiftOperator {
+	
+	Queue<ElevatorCall> calls;
+	
+	public TestAI() {
+		calls = new LinkedList<ElevatorCall>();
+	}
+
+	public void step() {
+		for (int i = 0; i < elevatorCalls.size(); i++) {
+			calls.add(elevatorCalls.get(i));
+		}
+		elevatorCalls.clear();
+		System.out.println(calls);
+		System.out.println(elevatorCalls);
+	}
+
+}

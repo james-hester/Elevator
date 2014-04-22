@@ -1,0 +1,44 @@
+import java.util.ArrayList;
+
+public class World {
+	
+	static ArrayList<GuestSpace> guestSpaces = new ArrayList<GuestSpace>();
+	static ArrayList<Steppable> steppables = new ArrayList<Steppable>();
+	private static LiftOperator control = new TestAI();  //To change the AI running the Elevators change this
+	static Building building = new Building(control);
+	static boolean running = true;
+	
+	public World(int floors, int elevators) {
+		//World Init
+		for (int i = 0; i < floors; i++)
+			World.getBuilding().addFloor();  //To change the height of the floors add an integer argument to addFloor()
+		for (int i = 0; i < elevators; i++)
+			World.getBuilding().addElevator();
+		
+		//Guests Init
+		Guest testGuest = new Guest();
+		testGuest.callElevator(Elevator.DIRECTION.UP);
+		
+		World.getBuilding().getElevators().get(0).addDestination(World.getBuilding().getFloors().get(4));
+		World.getBuilding().getElevators().get(0).addDestination(World.getBuilding().getFloors().get(1));
+		System.out.println(World.getBuilding().getElevators().get(0).getDestinations());
+	}
+	
+	public static Building getBuilding() {
+		return building;
+	}
+	
+	public void run() {
+		while (World.running)
+			for (Steppable x : steppables)
+				x.step();
+	}
+	
+	public static void main (String[] args) {
+		
+		World world = new World (Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+		world.run();
+		
+	}
+	
+}

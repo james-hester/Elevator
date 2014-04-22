@@ -1,0 +1,43 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+
+public class TestAI extends LiftOperator {
+	
+	LinkedList<ElevatorCall> calls;
+	ArrayList<Elevator> elevatorsOnCall;
+	ArrayList<Elevator> elevatorsOffCall;
+	
+	public TestAI() {
+		calls = new LinkedList<ElevatorCall>();
+	}
+
+	public void step() {
+		for (int i = 0; i < elevatorCalls.size(); i++) {
+			calls.add(elevatorCalls.get(i));
+		}
+		while (!calls.isEmpty()) {
+			ElevatorCall e = calls.pop();
+			if (elevatorPassing(e.getFloor()) != null)
+				elevatorPassing(e.getFloor()).
+		}
+		
+		elevatorCalls.clear();
+	}
+	
+	public Elevator elevatorPassing(Floor floor) {
+		for (int i = 0; i < elevatorsOnCall.size(); i++) {
+			if (World.getBuilding().getFloors().indexOf(elevatorsOnCall.get(i).getDestinations().first())
+					<= World.getBuilding().getFloors().indexOf(floor)
+					&& elevatorsOnCall.get(i).getDirection() == Elevator.DIRECTION.DOWN)
+				return elevatorsOnCall.get(i);
+			if (World.getBuilding().getFloors().indexOf(elevatorsOnCall.get(i).getDestinations().last())
+					>= World.getBuilding().getFloors().indexOf(floor)
+					&& elevatorsOnCall.get(i).getDirection() == Elevator.DIRECTION.UP)
+				return elevatorsOnCall.get(i);
+		}
+		return null;
+	}
+
+}

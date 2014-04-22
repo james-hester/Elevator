@@ -1,0 +1,115 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+
+public class TestAI extends LiftOperator {
+	
+	LinkedList<ElevatorCall> calls;
+	ArrayList<Elevator> elevatorsOnCall;
+	ArrayList<Elevator> elevatorsOffCall;
+	
+	public TestAI() {
+		calls = new LinkedList<ElevatorCall>();
+		elevatorsOnCall = new ArrayList<Elevator>();
+		elevatorsOffCall = new ArrayList<Elevator>();
+	}
+
+	public void step() {
+		checkAllElevators();
+		//Logic for assigning elevators to calls
+		for (int i = 0; i < elevatorCalls.size(); i++) {
+			calls.add(elevatorCalls.get(i));
+		}
+		while (!calls.isEmpty()) {
+			ElevatorCall e = calls.pop();
+			if (elevatorPassing(e.getFloor()) != null)
+				elevatorPassing(e.getFloor()).addDestination(e.getFloor());
+			else {
+				Elevator elevator = getClosestTo(e.getFloor());
+				System.out.println(elevatorsOffCall);
+				System.out.println(elevator);
+				System.out.println(e.getFloor());
+				elevator.addDestination(e.getFloor());
+				elevatorsOffCall.remove(elevator);
+				elevatorsOnCall.add(elevator);
+			}
+		}
+		
+		elevatorCalls.clear();
+		
+		//Logic for moving the elevators
+		for (int i = 0; i < elevatorsOnCall.size(); i++) {
+			if (elevatorsOnCall.get(i).getDirection() == Elevator.DIRECTION.DOWN
+					&& elevatorsOnCall.get(i).getLocation() == 
+					elevatorsOnCall.get(i).getDestinations().last().getHeight()) {
+				elevatorsOnCall.get(i).setState(Elevator.DIRECTION.INACTIVE);
+				elevatorsOnCall.get(i).toggleDoors();
+				elevatorsOnCall.get(i).adjacentSpace.add(elevatorsOnCall.get(i).getDestinations().last());
+				elevatorsOnCall.get(i).getDestinations().remove(elevatorsOnCall.get(i).getDestinations().last());
+			}
+			else if (elevatorsOnCall.get(i).getDirection() == Elevator.DIRECTION.UP
+					&& elevatorsOnCall.get(i).getLocation() == 
+					elevatorsOnCall.get(i).getDestinations().first().getHeight()) {
+				elevatorsOnCall.get(i).setState(Elevator.DIRECTION.INACTIVE);
+				elevatorsOnCall.get(i).toggleDoors();
+				elevatorsOnCall.get(i).adjacentSpace.add(elevatorsOnCall.get(i).getDestinations().first());
+				elevatorsOnCall.get(i).getDestinations().remove(elevatorsOnCall.get(i).getDestinations().first());
+			}
+			else if (elevatorsOnCall.get(i).getDirection() == Elevator.DIRECTION.INACTIVE
+					&& elevatorsOnCall.get(i).getDestinations().isEmpty()) {
+				elevatorsOffCall.add(elevatorsOnCall.get(i));
+				elevatorsOnCall.remove(i);
+			}
+			else if (elevatorsOnCall.get(i).getDirection() == Elevator.DIRECTION.INACTIVE
+					&& !elevatorsOnCall.get(i).getDestinations().isEmpty()) {
+				elevatorsOnCall.get(i).toggleDoors();
+				elevatorsOnCall.get(i).adjacentSpace.clear();
+				if (elevatorsOnCall.get(i).getLocation() < elevatorsOnCall.get(i).getDestinations().first().getHeight())
+					elevatorsOnCall.get(i).setState(Elevator.DIRECTION.UP);
+				else
+					elevatorsOnCall.get(i).setState(Elevator.DIRECTION.DOWN);
+			}
+		}
+				
+	}
+	
+	public Elevator elevatorPassing(Floor floor) {
+		for (int i = 0; i < elevatorsOnCall.size(); i++) {
+			if (World.getBuilding().getFloors().indexOf(elevatorsOnCall.get(i).getDestinations().first())
+					<= World.getBuilding().getFloors().indexOf(floor)
+					&& elevatorsOnCall.get(i).getDirection() == Elevator.DIRECTION.DOWN)
+				return elevatorsOnCall.get(i);
+			if (World.getBuilding().getFloors().indexOf(elevatorsOnCall.get(i).getDestinations().last())
+					>= World.getBuilding().getFloors().indexOf(floor)
+					&& elevatorsOnCall.get(i).getDirection() == Elevator.DIRECTION.UP)
+				return elevatorsOnCall.get(i);
+		}
+		return null;
+	}
+	
+	public Elevator getClosestTo(Floor floor) {
+		Elevator elevator = null;
+		for (int i = 0; i < elevatorsOffCall.size(); i++) { 
+			if (elevator == null || distanceFromFloor(floor, elevatorsOffCall.get(i))
+					<= distanceFromFloor(floor, elevator))
+				elevator = elevatorsOffCall.get(i);
+		}
+		return elevator;
+	}
+	
+	public void checkAllElevators() {
+		ArrayList<Elevator> total = new ArrayList<Elevator>();
+		total.addAll(elevatorsOffCall);
+		total.addAll(elevatorsOnCall);
+		for (int i = 0; i < World.getBuilding().getElevators().size(); i++) {
+			if (!total.contains(World.getBuilding().getElevators().get(i))) {
+				if (!World.getBuilding().getElevators().get(i).getDestinations().isEmpty())
+					elevatorsOnCall.add(World.getBuilding().getElevators().get(i));
+				else
+					elevatorsOffCall.add(World.getBuilding().getElevators().get(i));
+			}
+		}
+	}
+
+}
