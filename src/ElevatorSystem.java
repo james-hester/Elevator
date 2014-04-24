@@ -1,22 +1,33 @@
 import javax.swing.*;
 
+/**
+ * Main class for Elevator program.
+ * Initializes as many Elevators and Floors as the user wants
+ * and then sets up components of the program whose operation
+ * depends on what these quantities are (ElevatorGUI and ElevatorController).
+ * After doing so, serves as an access point for Elevators and Floors through
+ * static accessor methods.
+ * @author 
+ * @version 1.2
+ * 
+ */
 public class ElevatorSystem extends JFrame
 {
-	private static final long	serialVersionUID = 1L;
-	private static final int	NUM_ELEVATORS = 5;
+	private static final long	serialVersionUID = 1L; //Compiler gives warning unless this is included. 
+	
+	private static final int	NUM_ELEVATORS = 6;
 	private static final int	NUM_FLOORS = 6;
 	/**
 	 * Array storing each of the elevators used by the program.
-	 * Initialized by the constructor of this class and passed as a reference
-	 * to each of the elevators for their use. (An elevator can thereby directly 
-	 * monitor the movement of other elevators to optimize its own performance.)
+	 * Initialized by the constructor of this class and accessible
+	 * through getElevator(int) and getNumberOfElevators().
 	 */
-	private Elevator[]	elevators;
+	private static Elevator[]	elevators;
 	/**
 	 * Array storing each of the floors used by the program.
-	 * Likewise passed as a reference to each of the elevators.
+	 * Likewise used by other classes through static accessor methods.
 	 */
-	private Floor[]		floors;
+	private static Floor[]		floors;
 	
 	public ElevatorSystem(int numberOfFloors, int numberOfElevators)
 	{
@@ -28,19 +39,39 @@ public class ElevatorSystem extends JFrame
 
 		for(int id = 0; id < numberOfElevators; id++)
 		{
-			elevators[id] = new Elevator(id, elevators, floors);
+			elevators[id] = new Elevator(id);
 		}
 		
 		for(int id = 0; id < numberOfFloors; id++)
 		{
-			floors[id] = new Floor(id, numberOfFloors);
+			floors[id] = new Floor(id);
 		}
 		
-		ElevatorGUI theGUI = new ElevatorGUI( elevators, floors );
-		ElevatorController theController = new ElevatorController( elevators, floors );
+		ElevatorGUI theGUI = new ElevatorGUI();
+		ElevatorController theController = new ElevatorController();
 		
 		setContentPane(theGUI);
 		setSize(theGUI.getSize());
+	}
+	
+	public static synchronized Elevator getElevator(int which)
+	{
+		return elevators[which];
+	}
+	
+	public static synchronized Floor getFloor(int which)
+	{
+		return floors[which];
+	}
+	
+	public static int getNumberOfFloors()
+	{
+		return floors.length;
+	}
+	
+	public static int getNumberOfElevators()
+	{
+		return elevators.length;
 	}
 	
 	public static void main(String[] args)

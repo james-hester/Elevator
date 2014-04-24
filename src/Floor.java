@@ -10,10 +10,6 @@ public class Floor
 	 */
 	private static final int	MAX_PER_DESTINATION = 5;
 	/**
-	 * The total number of floors in the system.
-	 */
-	private int			numberOfFloors;
-	/**
 	 * The number of this floor. Starts at zero, signifying the ground floor.
 	 */
 	private int			id;
@@ -30,16 +26,14 @@ public class Floor
 	/**
 	 * Constructs a new Floor with a given ordinal number and reference to number of total floors.
 	 * @param _id number of this floor
-	 * @param _numberOfFloors total number of floors in the system
 	 */
-	public Floor(int _id, int _numberOfFloors)
+	public Floor(int _id)
 	{
 		id = _id;
-		numberOfFloors = _numberOfFloors;
 		
 		rand = new Random();
 		
-		guests = new int[numberOfFloors];
+		guests = new int[ElevatorSystem.getNumberOfFloors()];
 		generateGuests();
 	}
 	
@@ -56,7 +50,7 @@ public class Floor
 	 */
 	public void takeGuestsGoingUp(int[] guestsGoingUp)
 	{
-		for(int i = id; i < numberOfFloors; i++)
+		for(int i = id; i < ElevatorSystem.getNumberOfFloors(); i++)
 		{
 			guestsGoingUp[i] += guests[i];
 			guests[i] = 0;
@@ -84,7 +78,7 @@ public class Floor
 	 */
 	public void generateGuests()
 	{
-		for(int i = 0; i < numberOfFloors; i++)
+		for(int i = 0; i < ElevatorSystem.getNumberOfFloors(); i++)
 		{
 			if (i != id)
 				{ guests[i] += rand.nextInt(MAX_PER_DESTINATION); }
@@ -102,7 +96,7 @@ public class Floor
 		int	up = 0, down = 0;
 		for(int i = 0; i < id; i++)
 			down += guests[i];
-		for(int i = id; i < numberOfFloors; i++)
+		for(int i = id; i < ElevatorSystem.getNumberOfFloors(); i++)
 			up += guests[i];
 		
 		Elevator.Direction result = (up > down ? Elevator.Direction.UP : Elevator.Direction.DOWN);
