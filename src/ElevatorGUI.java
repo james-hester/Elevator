@@ -50,7 +50,7 @@ class ElevatorGUI extends Container implements MouseListener
 	 */
 	private static final String	DOORS_OPEN_IMG_NAME = "open.png";
 	private static final String	DOORS_CLOSED_IMG_NAME = "closed.png";
-	//private static final String SHAFT_IMG_NAME = "shaft.png";
+	private static final String SHAFT_IMG_NAME = "shaft.png";
 	private static final String	PANEL_IMG_NAME = "panel.png";
 	private static final String	BUTTON_ON_IMG_NAME = "button_on.png";
 	private static final String	BUTTON_OFF_IMG_NAME = "button_off.png";
@@ -69,7 +69,7 @@ class ElevatorGUI extends Container implements MouseListener
 		{
 			imgElevatorDoorsOpen = ImageIO.read(new File(DOORS_OPEN_IMG_NAME));
 			imgElevatorDoorsClosed = ImageIO.read(new File(DOORS_CLOSED_IMG_NAME));
-			//imgElevatorShaft = ImageIO.read(new File(SHAFT_IMG_NAME));
+			imgElevatorShaft = ImageIO.read(new File(SHAFT_IMG_NAME));
 			imgPanel = ImageIO.read(new File(PANEL_IMG_NAME));
 			imgButtonOn = ImageIO.read(new File(BUTTON_ON_IMG_NAME));
 			imgButtonOff = ImageIO.read(new File(BUTTON_OFF_IMG_NAME));
@@ -88,10 +88,8 @@ class ElevatorGUI extends Container implements MouseListener
 		
 		elevatorWidth = imgElevatorDoorsOpen.getWidth();
 		elevatorHeight = imgElevatorDoorsOpen.getHeight();
-		elevatorShaftWidth = elevatorWidth + 10;
+		elevatorShaftWidth = imgElevatorShaft.getWidth();
 
-		
-		
 		//Resize the window based on the number
 		//and width of elevators and floors.
 		int windowWidth, windowHeight;
@@ -110,11 +108,15 @@ class ElevatorGUI extends Container implements MouseListener
 	@Override
 	public void paint(Graphics g)
 	{
+		//Draw line separating floors from elevators.
 		g.drawLine(FLOOR_DISPLAY_WIDTH, 0, FLOOR_DISPLAY_WIDTH, getHeight());
 		
-		for(int i = 0; i < this.getHeight(); i+=elevatorHeight)
+		for(int i = 0; i < ElevatorSystem.getNumberOfElevators(); i++)
 		{
-			g.drawLine(0, i, FLOOR_DISPLAY_WIDTH, i);
+			for(int j = 0; j < ElevatorSystem.getNumberOfFloors(); j++)
+			{
+				g.drawImage(imgElevatorShaft, (i*elevatorShaftWidth)+FLOOR_DISPLAY_WIDTH, j*elevatorHeight, null);
+			}
 		}
 		
 		//Redraw elevators...
@@ -138,26 +140,24 @@ class ElevatorGUI extends Container implements MouseListener
 				g.drawImage(imgElevatorDoorsOpen, elevatorX, elevatorY, null);
 			if (elevatorBeingDrawn.isBetweenFloors())
 				g.drawImage(imgElevatorDoorsClosed, elevatorX, elevatorY, null);
-
-			
-			/*
-			 * The following four lines draw the current floor number and lights
-			 * (as a boolean array) onto the elevator. 
-			 */
-			g.drawString(Integer.toString(elevatorBeingDrawn.getFloor()), elevatorX+5, elevatorY+15);
-			g.setFont(getFont().deriveFont(9.0f)); //Change font size to 9.0
-			g.drawString(Arrays.toString(elevatorBeingDrawn.getLights()), elevatorX+5, elevatorY+30);
-			g.setFont(getFont().deriveFont(12.0f)); //Change font size back to 12.0
 		}
 	
 		//Redraw floors...
 		for(int i = 0; i < ElevatorSystem.getNumberOfFloors(); i++)
 		{
 			Floor floorBeingDrawn = ElevatorSystem.getFloor(i);
+			
+			g.drawLine(0, i*elevatorHeight, FLOOR_DISPLAY_WIDTH, i*elevatorHeight);
 			g.drawString(Arrays.toString(floorBeingDrawn.getGuests()), 10, getHeight() - (i * elevatorHeight) - 10);
 		}
 	}
 
+	/**
+	 * Provides a facility to respond to user mouse input.
+	 * If an elevator is clicked--indeed, if any point in an
+	 * elevator's shaft is clicked--a PanelView (a dialog window
+	 * representing that elevator's panel) will be displayed.
+	 */
 	@Override
 	public void mouseClicked(MouseEvent arg0)
 	{
@@ -184,7 +184,11 @@ class ElevatorGUI extends Container implements MouseListener
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {}
-		
+	
+	/**
+	 * Class representing the window showing an Elevator's panel.
+	 * Simply displays which floors the Elevator being inspected is traveling to.
+	 */
 	class PanelView extends JFrame
 	{
 		private static final long	serialVersionUID = 1L;
@@ -193,21 +197,35 @@ class ElevatorGUI extends Container implements MouseListener
 		public PanelView(int whichElevator)
 		{
 			which = whichElevator;
-			this.setTitle("Elevator "+(which+1));
+			
+			setTitle("Elevator "+(which+1));
 			setSize(imgPanel.getWidth(), imgPanel.getHeight());
+			setResizable(false);
 			setVisible(true);
 		}
 		
 		@Override
 		public void paint(Graphics g)
 		{
+			//Draw the background image.
 			g.drawImage(imgPanel, 0, 0, null);
 			
-			g.setFont(new Font("SansSerif",Font.BOLD,15));
+			//Font used to draw the numerals. Font.SANS_SERIF is part of the JDK.
+			g.setFont(new Font(Font.SANS_SERIF,Font.BOLD,15));
 			
+			/*
+			 * The buttons in the elevator are drawn one-by-one, from bottom to top:
+			 * the first floor is at the bottom of the panel. Should one column be required,
+			 * the panel is divided in two, and the buttons are drawn along the median.
+			 * Should two columns be required, the panel is divided into thirds, with
+			 * the buttons lying along the two medians, etc.
+			 */
+			
+			//First, calculate the number of columns needed to fit in a button for each floor.
 			int numberOfColumns = (ElevatorSystem.getNumberOfFloors() * (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING)) / imgPanel.getHeight();
 			numberOfColumns++;
 			
+			//Then, calculate the maximum number of buttons that can fit in one of these columns.
 			int buttonsPerColumn = imgPanel.getHeight() / (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING);
 			
 			int currentColumn = 1;
@@ -217,9 +235,11 @@ class ElevatorGUI extends Container implements MouseListener
 					currentColumn++;
 				
 				int x = (imgPanel.getWidth() * currentColumn) / (numberOfColumns + 1);
-				int y = (imgPanel.getHeight() - ( (buttonToDraw % buttonsPerColumn) + 1) * (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING));
-				x -= imgButtonOn.getWidth() / 2;
+				x -= imgButtonOn.getWidth() / 2; //adjust for width of button
 				
+				int y = (imgPanel.getHeight() - ( (buttonToDraw % buttonsPerColumn) + 1) * (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING));
+				
+				//Now we can finally draw the button.
 				if (ElevatorSystem.getElevator(which).getLights()[buttonToDraw] == true)
 				{
 					g.drawImage(imgButtonOn, x, y, null);
@@ -234,14 +254,13 @@ class ElevatorGUI extends Container implements MouseListener
 				}
 				
 				repaint();
+			} //for(...)
 
-			}
-
-		}
+		}//paint(Graphics)
 		
-	}
+	}//PanelView class
 
-}
+}//ElevatorGUI class
 
 
 
