@@ -3,7 +3,10 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
-
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.*;
 import javax.swing.Timer;
 
 /**
@@ -25,20 +28,54 @@ class ElevatorGUI extends Container
 	 * The following are the sizes of screen elements in pixels.
 	 * Changing these will not change the behavior of the program.
 	 */
-	private static final int	ELEVATOR_HEIGHT = 160;
-	private static final int	ELEVATOR_WIDTH = 170;
-	private static final int	ELEVATOR_SHAFT_WIDTH = 180;
+	private static int	elevatorHeight = 160;
+	private static int	elevatorWidth = 170;
+	private static int	elevatorShaftWidth = 180;
+	
 	private static final int	FLOOR_DISPLAY_WIDTH = 200;
 	private static final int	BOTTOM_SCREEN_MARGIN = 24;
-		
+	/*
+	 * Filenames of the image files used by the GUI.
+	 */
+	private static final String	DOORS_OPEN_IMG_NAME = "open.png";
+	private static final String	DOORS_CLOSED_IMG_NAME = "closed.png";
+	
+	private static BufferedImage imgElevatorDoorsOpen;
+	private static BufferedImage imgElevatorDoorsClosed;
+
+	
 	public ElevatorGUI()
-	{			
+	{	
+		
+		try 
+		{
+			imgElevatorDoorsOpen = ImageIO.read(new File(DOORS_OPEN_IMG_NAME));
+			imgElevatorDoorsClosed = ImageIO.read(new File(DOORS_CLOSED_IMG_NAME));
+		} catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		
+		if (imgElevatorDoorsOpen.getHeight() != imgElevatorDoorsClosed.getHeight() 
+				|| imgElevatorDoorsOpen.getWidth() != imgElevatorDoorsClosed.getWidth())
+		{
+			System.err.println("Error: images of closed elevator doors");
+			System.err.println("and open elevator doors are not the same size.");
+			System.exit(1);
+		}
+		
+		elevatorWidth = imgElevatorDoorsOpen.getWidth();
+		elevatorHeight = imgElevatorDoorsOpen.getHeight();
+		elevatorShaftWidth = elevatorWidth + 10;
+
+		
+		
 		//Resize the window based on the number
 		//and width of elevators and floors.
 		int windowWidth, windowHeight;
 		
-		windowWidth = (ELEVATOR_SHAFT_WIDTH * ElevatorSystem.getNumberOfElevators()) + FLOOR_DISPLAY_WIDTH;
-		windowHeight = (ELEVATOR_HEIGHT * ElevatorSystem.getNumberOfFloors()) + BOTTOM_SCREEN_MARGIN;
+		windowWidth = (elevatorShaftWidth * ElevatorSystem.getNumberOfElevators()) + FLOOR_DISPLAY_WIDTH;
+		windowHeight = (elevatorHeight * ElevatorSystem.getNumberOfFloors()) + BOTTOM_SCREEN_MARGIN;
 		
 		this.setSize(windowWidth, windowHeight);
 		
@@ -53,7 +90,7 @@ class ElevatorGUI extends Container
 	{
 		g.drawLine(FLOOR_DISPLAY_WIDTH, 0, FLOOR_DISPLAY_WIDTH, getHeight());
 		
-		for(int i = 0; i < this.getHeight(); i+=ELEVATOR_HEIGHT)
+		for(int i = 0; i < this.getHeight(); i+=elevatorHeight)
 		{
 			g.drawLine(0, i, FLOOR_DISPLAY_WIDTH, i);
 		}
@@ -63,19 +100,23 @@ class ElevatorGUI extends Container
 		{
 			Elevator elevatorBeingDrawn = ElevatorSystem.getElevator(i);
 			
-			int elevatorX = ( FLOOR_DISPLAY_WIDTH + (elevatorBeingDrawn.getID() * ELEVATOR_SHAFT_WIDTH) + ( (ELEVATOR_SHAFT_WIDTH - ELEVATOR_WIDTH) / 2 ) );
-			int elevatorY = ( (ElevatorSystem.getNumberOfFloors() - elevatorBeingDrawn.getFloor()) - 1) * ELEVATOR_HEIGHT;
+			int elevatorX = ( FLOOR_DISPLAY_WIDTH + (elevatorBeingDrawn.getID() * elevatorShaftWidth) + ( (elevatorShaftWidth - elevatorWidth) / 2 ) );
+			int elevatorY = ( (ElevatorSystem.getNumberOfFloors() - elevatorBeingDrawn.getFloor()) - 1) * elevatorHeight;
 			
 			if(elevatorBeingDrawn.isGoingUp())
 			{
-				elevatorY -= (int)( (float)ELEVATOR_HEIGHT * elevatorBeingDrawn.getDisplacementPercent() );
+				elevatorY -= (int)( (float)elevatorHeight * elevatorBeingDrawn.getDisplacementPercent() );
 			}
 			else
 			{
-				elevatorY += (int)( (float)ELEVATOR_HEIGHT * elevatorBeingDrawn.getDisplacementPercent() );
+				elevatorY += (int)( (float)elevatorHeight * elevatorBeingDrawn.getDisplacementPercent() );
 			}	
 			
-			g.drawRect(elevatorX, elevatorY, ELEVATOR_WIDTH, ELEVATOR_HEIGHT);
+			if (elevatorBeingDrawn.isStopped())
+				g.drawImage(imgElevatorDoorsOpen, elevatorX, elevatorY, null);
+			if (elevatorBeingDrawn.isBetweenFloors())
+				g.drawImage(imgElevatorDoorsClosed, elevatorX, elevatorY, null);
+
 			
 			/*
 			 * The following four lines draw the current floor number and lights
@@ -91,7 +132,7 @@ class ElevatorGUI extends Container
 		for(int i = 0; i < ElevatorSystem.getNumberOfFloors(); i++)
 		{
 			Floor floorBeingDrawn = ElevatorSystem.getFloor(i);
-			g.drawString(Arrays.toString(floorBeingDrawn.getGuests()), 10, getHeight() - (i * ELEVATOR_HEIGHT) - 10);
+			g.drawString(Arrays.toString(floorBeingDrawn.getGuests()), 10, getHeight() - (i * elevatorHeight) - 10);
 		}
 	}
 		
