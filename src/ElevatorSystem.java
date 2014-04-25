@@ -15,7 +15,7 @@ public class ElevatorSystem extends JFrame
 {
 	private static final long	serialVersionUID = 1L; //Compiler gives warning unless this is included. 
 	
-	private static final int	NUM_ELEVATORS = 6;
+	private static final int	NUM_ELEVATORS = 5;
 	private static final int	NUM_FLOORS = 6;
 	/**
 	 * Array storing each of the elevators used by the program.
@@ -50,6 +50,7 @@ public class ElevatorSystem extends JFrame
 		ElevatorGUI theGUI = new ElevatorGUI();
 		ElevatorController theController = new ElevatorController();
 		
+		addMouseListener(theGUI);
 		setContentPane(theGUI);
 		setSize(theGUI.getSize());
 	}
