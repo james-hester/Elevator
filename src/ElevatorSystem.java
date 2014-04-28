@@ -115,8 +115,6 @@ public class ElevatorSystem extends JFrame
 	      }
 	      finally
 	      {
-	    	  System.out.println(numFloors);
-	    	  System.out.println(numElevators);
 	    	  if (numFloors < MIN_FLOORS || numElevators < MIN_ELEVATORS)
 	    	  {
 		    	  JOptionPane.showMessageDialog(null, 
