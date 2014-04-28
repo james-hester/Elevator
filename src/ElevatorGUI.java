@@ -30,6 +30,7 @@ class ElevatorGUI extends Container implements MouseListener
 	 * Frames per second can be calculated by (1000/REPAINT_FREQUENCY).
 	 */
 	private static final int	REPAINT_FREQUENCY = 22;
+	private static final int	PANEL_REPAINT_FREQUENCY = 100;
 	/*
 	 * The following are the sizes of screen elements in pixels.
 	 * Changing these will not change the behavior of the program.
@@ -193,6 +194,8 @@ class ElevatorGUI extends Container implements MouseListener
 	{
 		private static final long	serialVersionUID = 1L;
 		private int	which;
+		private int[]	x;
+		private int[]	y;
 		
 		public PanelView(int whichElevator)
 		{
@@ -202,6 +205,30 @@ class ElevatorGUI extends Container implements MouseListener
 			setSize(imgPanel.getWidth(), imgPanel.getHeight());
 			setResizable(false);
 			setVisible(true);
+			
+			x = new int[ElevatorSystem.getNumberOfFloors()];
+			y = new int[ElevatorSystem.getNumberOfFloors()];
+			
+			//First, calculate the number of columns needed to fit in a button for each floor.
+			int numberOfColumns = (ElevatorSystem.getNumberOfFloors() * (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING)) / imgPanel.getHeight();
+			numberOfColumns++;
+			
+			//Then, calculate the maximum number of buttons that can fit in one of these columns.
+			int buttonsPerColumn = imgPanel.getHeight() / (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING);
+			
+			int currentColumn = 1;
+			for(int buttonToDraw = 0; buttonToDraw < ElevatorSystem.getNumberOfFloors(); buttonToDraw++)
+			{
+				if (buttonToDraw % buttonsPerColumn == 0 && buttonToDraw != 0)
+					currentColumn++;
+				
+				x[buttonToDraw] = (imgPanel.getWidth() * currentColumn) / (numberOfColumns + 1);
+				x[buttonToDraw] -= imgButtonOn.getWidth() / 2; //adjust for width of button
+				
+				y[buttonToDraw] = (imgPanel.getHeight() - ( (buttonToDraw % buttonsPerColumn) + 1) * (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING));
+			}
+			
+			new Timer(PANEL_REPAINT_FREQUENCY, new RepaintActionHandler(this)).start();
 		}
 		
 		@Override
@@ -221,39 +248,20 @@ class ElevatorGUI extends Container implements MouseListener
 			 * the buttons lying along the two medians, etc.
 			 */
 			
-			//First, calculate the number of columns needed to fit in a button for each floor.
-			int numberOfColumns = (ElevatorSystem.getNumberOfFloors() * (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING)) / imgPanel.getHeight();
-			numberOfColumns++;
-			
-			//Then, calculate the maximum number of buttons that can fit in one of these columns.
-			int buttonsPerColumn = imgPanel.getHeight() / (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING);
-			
-			int currentColumn = 1;
 			for(int buttonToDraw = 0; buttonToDraw < ElevatorSystem.getNumberOfFloors(); buttonToDraw++)
 			{
-				if (buttonToDraw % buttonsPerColumn == 0 && buttonToDraw != 0)
-					currentColumn++;
-				
-				int x = (imgPanel.getWidth() * currentColumn) / (numberOfColumns + 1);
-				x -= imgButtonOn.getWidth() / 2; //adjust for width of button
-				
-				int y = (imgPanel.getHeight() - ( (buttonToDraw % buttonsPerColumn) + 1) * (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING));
-				
-				//Now we can finally draw the button.
 				if (ElevatorSystem.getElevator(which).getLights()[buttonToDraw] == true)
 				{
-					g.drawImage(imgButtonOn, x, y, null);
+					g.drawImage(imgButtonOn, x[buttonToDraw], y[buttonToDraw], null);
 					g.setColor(Color.RED);
-					g.drawString(String.valueOf(buttonToDraw+1), x+LABEL_OFFSET_X, y+LABEL_OFFSET_Y);
+					g.drawString(String.valueOf(buttonToDraw+1), x[buttonToDraw]+LABEL_OFFSET_X, y[buttonToDraw]+LABEL_OFFSET_Y);
 				}
 				else
 				{
-					g.drawImage(imgButtonOff, x, y, null);
+					g.drawImage(imgButtonOff, x[buttonToDraw], y[buttonToDraw], null);
 					g.setColor(Color.BLACK);
-					g.drawString(String.valueOf(buttonToDraw+1), x+LABEL_OFFSET_X, y+LABEL_OFFSET_Y);
-				}
-				
-				repaint();
+					g.drawString(String.valueOf(buttonToDraw+1), x[buttonToDraw]+LABEL_OFFSET_X, y[buttonToDraw]+LABEL_OFFSET_Y);
+				}				
 			} //for(...)
 
 		}//paint(Graphics)
