@@ -91,8 +91,10 @@ public class ElevatorSystem extends JFrame
 		   */
 		  
 	      JTextField elevatorField = new JTextField(4);
+	      elevatorField.setText(Integer.toString(MIN_ELEVATORS));
 	      JTextField floorField = new JTextField(4);
-
+	      floorField.setText(Integer.toString(MIN_FLOORS));
+	      
 	      JPanel prompt = new JPanel();
 	      prompt.add(new JLabel("Number of elevators:"));
 	      prompt.add(elevatorField);
