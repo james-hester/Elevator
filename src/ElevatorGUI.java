@@ -236,46 +236,46 @@ class ElevatorGUI extends Container implements MouseListener
 		{
 			for(int i = 0; i < ElevatorSystem.getNumberOfElevators(); i++)
 			{
-			//Draw the background image.
-			g.drawImage(imgPanel, (i)*200, 0, null);
+				//Draw the background image.
+				g.drawImage(imgPanel, (i)*200, 0, null);
 			
-			//Draw lines separating the panels
-			g.setColor(Color.BLACK);	
-			g.drawLine((i)*200, 0, (i)*200, getHeight());
-
-			//Draw label to specify the floor number
-			Label floor = new Label("Elevator: " + (i+1));
-			floor.setLocation((i*200)+70, 20);
-			add(floor);
+				//Draw lines separating the panels
+				g.setColor(Color.BLACK);	
+				g.drawLine((i)*200, 0, (i)*200, getHeight());
 			
-			
-			//Font used to draw the numerals. Font.SANS_SERIF is part of the JDK.
-			g.setFont(new Font(Font.SANS_SERIF,Font.BOLD,15));
+				//Font used to draw the numerals. Font.SANS_SERIF is part of the JDK.
+				g.setFont(new Font(Font.SANS_SERIF,Font.BOLD,15));
 
-			/*
-			 * The buttons in the elevator are drawn one-by-one, from bottom to top:
-			 * the first floor is at the bottom of the panel. Should one column be required,
-			 * the panel is divided in two, and the buttons are drawn along the median.
-			 * Should two columns be required, the panel is divided into thirds, with
-			 * the buttons lying along the two medians, etc.
-			 */
+				/*
+				 * The buttons in the elevator are drawn one-by-one, from bottom to top:
+				 * the first floor is at the bottom of the panel. Should one column be required,
+				 * the panel is divided in two, and the buttons are drawn along the median.
+				 * Should two columns be required, the panel is divided into thirds, with
+				 * the buttons lying along the two medians, etc.
+				 */
 
-			for(int buttonToDraw = 0; buttonToDraw < ElevatorSystem.getNumberOfFloors(); buttonToDraw++)
-			{
-				if (ElevatorSystem.getElevator(i).getLights()[buttonToDraw] == true)
+				for(int buttonToDraw = 0; buttonToDraw < ElevatorSystem.getNumberOfFloors(); buttonToDraw++)
 				{
-					g.drawImage(imgButtonOn, x[buttonToDraw] + ((i)*200), y[buttonToDraw], null);
-					g.setColor(Color.RED);
-					g.drawString(String.valueOf(buttonToDraw+1), x[buttonToDraw]+LABEL_OFFSET_X + ((i)*200), y[buttonToDraw]+LABEL_OFFSET_Y);
-				}
-				else
-				{
-					g.drawImage(imgButtonOff, x[buttonToDraw] + ((i)*200), y[buttonToDraw], null);
-					g.setColor(Color.BLACK);
-					g.drawString(String.valueOf(buttonToDraw+1), x[buttonToDraw]+LABEL_OFFSET_X + ((i)*200), y[buttonToDraw]+LABEL_OFFSET_Y);
-				}				
-			} //for(...)
-		}
+					if (ElevatorSystem.getElevator(i).getLights()[buttonToDraw] == true)
+					{
+						g.drawImage(imgButtonOn, x[buttonToDraw] + ((i)*200), y[buttonToDraw], null);
+						g.setColor(Color.RED);
+						g.drawString(String.valueOf(buttonToDraw+1), x[buttonToDraw]+LABEL_OFFSET_X + ((i)*200), y[buttonToDraw]+LABEL_OFFSET_Y);
+					}
+					else
+					{
+						g.drawImage(imgButtonOff, x[buttonToDraw] + ((i)*200), y[buttonToDraw], null);
+						g.setColor(Color.BLACK);
+						g.drawString(String.valueOf(buttonToDraw+1), x[buttonToDraw]+LABEL_OFFSET_X + ((i)*200), y[buttonToDraw]+LABEL_OFFSET_Y);
+					}				
+				} //for(...)
+			
+				//Draw label to specify the floor number
+				g.setColor(Color.BLACK);
+				g.setFont(new Font("SansSerif", Font.BOLD, 18));
+				g.drawString("Elevator: " + Integer.toString(i+1), 55+(i*imgPanel.getWidth()), 50);
+			
+			}
 		}//paint(Graphics)
 		
 	}//PanelView class
