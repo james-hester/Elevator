@@ -15,8 +15,13 @@ public class ElevatorSystem extends JFrame
 {
 	private static final long	serialVersionUID = 1L; //Compiler gives warning unless this is included. 
 	
-	private static final int	NUM_ELEVATORS = 6;
-	private static final int	NUM_FLOORS = 6;
+	/**
+	 * The minimum number of elevators and floors supported.
+	 * Note: program will not work correctly with less than 2 floors
+	 * or less than 1 elevator.
+	 */
+	private static final int	MIN_ELEVATORS = 4;
+	private static final int	MIN_FLOORS = 6;
 	/**
 	 * Array storing each of the elevators used by the program.
 	 * Initialized by the constructor of this class and accessible
@@ -50,6 +55,7 @@ public class ElevatorSystem extends JFrame
 		ElevatorGUI theGUI = new ElevatorGUI();
 		ElevatorController theController = new ElevatorController();
 		
+		addMouseListener(theGUI);
 		setContentPane(theGUI);
 		setSize(theGUI.getSize());
 	}
@@ -76,7 +82,53 @@ public class ElevatorSystem extends JFrame
 	
 	public static void main(String[] args)
 	{
-		ElevatorSystem theApp = new ElevatorSystem( NUM_FLOORS, NUM_ELEVATORS );
+		  int numElevators = 0;
+		  int numFloors = 0;
+		
+		  /*
+		   * Pop up a dialog and find out how many floors/
+		   * elevators the user wants.
+		   */
+		  
+	      JTextField elevatorField = new JTextField(4);
+	      elevatorField.setText(Integer.toString(MIN_ELEVATORS));
+	      JTextField floorField = new JTextField(4);
+	      floorField.setText(Integer.toString(MIN_FLOORS));
+	      
+	      JPanel prompt = new JPanel();
+	      prompt.add(new JLabel("Number of elevators:"));
+	      prompt.add(elevatorField);
+	      prompt.add(new JLabel("Number of floors:"));
+	      prompt.add(floorField);
+
+	      JOptionPane.showConfirmDialog(null, prompt, "Elevator System", JOptionPane.DEFAULT_OPTION);
+	      
+	      try
+	      {
+	    	  numElevators = Integer.parseInt(elevatorField.getText());
+	    	  numFloors = Integer.parseInt(floorField.getText());
+	      }
+	      catch (Exception e)
+	      {
+	    	 /*
+	    	  * Nothing needs to happen here:
+	    	  * if the user gave us junk values, the defaults will be used.
+	    	  */
+	      }
+	      finally
+	      {
+	    	  if (numFloors < MIN_FLOORS || numElevators < MIN_ELEVATORS)
+	    	  {
+		    	  JOptionPane.showMessageDialog(null, 
+		    			  "Error: values given were invalid. Default values will be used.",
+		    			  "Elevator System",
+		    			  JOptionPane.ERROR_MESSAGE);
+		    	  numFloors = MIN_FLOORS;
+		    	  numElevators = MIN_ELEVATORS;
+	    	  }
+	      }
+	      
+		ElevatorSystem theApp = new ElevatorSystem( numFloors, numElevators );
 		theApp.setResizable(false);
 		theApp.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		theApp.setVisible(true);

@@ -91,7 +91,7 @@ public class ElevatorController
 						{
 							for(int j = 0; j < weights.length; j++)
 							{
-								weights[i] += ElevatorSystem.getElevator(i).getGuests()[j];
+								weights[j] += ElevatorSystem.getElevator(i).getLights()[j] ? 1 : 0;
 							}
 						}
 						smallestWeight = weights[weights.length-1];
