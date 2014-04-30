@@ -55,6 +55,7 @@ class ElevatorGUI extends Container implements MouseListener
 	 */
 	private static final String	DOORS_OPEN_IMG_NAME = "ElevatorOpen.png";
 	private static final String	DOORS_CLOSED_IMG_NAME = "ElevatorClosed.png";
+	private static final String	DOORS_HALF_IMG_NAME = "ElevatorHalf.png";
 	private static final String SHAFT_IMG_NAME = "shaft2.png";
 	private static final String	PANEL_IMG_NAME = "panel.png";
 	private static final String	BUTTON_ON_IMG_NAME = "button_on.png";
@@ -62,6 +63,7 @@ class ElevatorGUI extends Container implements MouseListener
 
 	private static BufferedImage 	imgElevatorDoorsOpen;
 	private static BufferedImage 	imgElevatorDoorsClosed;
+	private static BufferedImage 	imgElevatorDoorsHalf;
 	private static BufferedImage	imgElevatorShaft;
 	private static BufferedImage	imgPanel;
 	private static BufferedImage	imgButtonOn;
@@ -70,6 +72,8 @@ class ElevatorGUI extends Container implements MouseListener
 	private static boolean[]	panelIsOpen;
 	private int	whichPanel;
 	
+	boolean animationPlayed = false;
+	
 	public ElevatorGUI()
 	{	
 		//First, attempt to load the images.
@@ -77,6 +81,7 @@ class ElevatorGUI extends Container implements MouseListener
 		{
 			imgElevatorDoorsOpen = ImageIO.read(new File(DOORS_OPEN_IMG_NAME));
 			imgElevatorDoorsClosed = ImageIO.read(new File(DOORS_CLOSED_IMG_NAME));
+			imgElevatorDoorsHalf = ImageIO.read(new File(DOORS_HALF_IMG_NAME));
 			imgElevatorShaft = ImageIO.read(new File(SHAFT_IMG_NAME));
 			imgPanel = ImageIO.read(new File(PANEL_IMG_NAME));
 			imgButtonOn = ImageIO.read(new File(BUTTON_ON_IMG_NAME));
@@ -155,10 +160,26 @@ class ElevatorGUI extends Container implements MouseListener
 				elevatorY += (int)( (float)elevatorHeight * elevatorBeingDrawn.getDisplacementPercent() );
 			}	
 
+			
+			
 			if (elevatorBeingDrawn.isStopped())
+			{
+				if(!animationPlayed)
+				{
+					g.drawImage(imgElevatorDoorsHalf, elevatorX, elevatorY, null);
+					animationPlayed = true;
+				}
 				g.drawImage(imgElevatorDoorsOpen, elevatorX, elevatorY, null);
+			}
 			if (elevatorBeingDrawn.isBetweenFloors())
+			{
+				if(animationPlayed)
+				{
+					g.drawImage(imgElevatorDoorsHalf, elevatorX, elevatorY, null);
+					animationPlayed = false;
+				}
 				g.drawImage(imgElevatorDoorsClosed, elevatorX, elevatorY, null);
+			}
 		}
 
 		//Redraw floors...
