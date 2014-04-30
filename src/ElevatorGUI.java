@@ -6,6 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Arrays;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -50,9 +53,9 @@ class ElevatorGUI extends Container implements MouseListener
 	/*
 	 * Filenames of the image files used by the GUI.
 	 */
-	private static final String	DOORS_OPEN_IMG_NAME = "open.png";
-	private static final String	DOORS_CLOSED_IMG_NAME = "closed.png";
-	private static final String SHAFT_IMG_NAME = "shaft.png";
+	private static final String	DOORS_OPEN_IMG_NAME = "ElevatorOpen.png";
+	private static final String	DOORS_CLOSED_IMG_NAME = "ElevatorClosed.png";
+	private static final String SHAFT_IMG_NAME = "shaft2.png";
 	private static final String	PANEL_IMG_NAME = "panel.png";
 	private static final String	BUTTON_ON_IMG_NAME = "button_on.png";
 	private static final String	BUTTON_OFF_IMG_NAME = "button_off.png";
@@ -64,9 +67,12 @@ class ElevatorGUI extends Container implements MouseListener
 	private static BufferedImage	imgButtonOn;
 	private static BufferedImage	imgButtonOff;
 
+	private static boolean[]	panelIsOpen;
+	private int	whichPanel;
+	
 	public ElevatorGUI()
 	{	
-
+		//First, attempt to load the images.
 		try 
 		{
 			imgElevatorDoorsOpen = ImageIO.read(new File(DOORS_OPEN_IMG_NAME));
@@ -75,11 +81,14 @@ class ElevatorGUI extends Container implements MouseListener
 			imgPanel = ImageIO.read(new File(PANEL_IMG_NAME));
 			imgButtonOn = ImageIO.read(new File(BUTTON_ON_IMG_NAME));
 			imgButtonOff = ImageIO.read(new File(BUTTON_OFF_IMG_NAME));
-		} catch (IOException e) 
+		} 
+		catch (IOException e) 
 		{
 			e.printStackTrace();
 		}
 
+		//Now, check whether the images' sizes are "sane" relative to each other.
+		//The images representing open and closed elevators must be the same size, etc.
 		if (imgElevatorDoorsOpen.getHeight() != imgElevatorDoorsClosed.getHeight() 
 				|| imgElevatorDoorsOpen.getWidth() != imgElevatorDoorsClosed.getWidth())
 		{
@@ -88,6 +97,10 @@ class ElevatorGUI extends Container implements MouseListener
 			System.exit(1);
 		}
 
+		
+		//If the images were successfully loaded, store several
+		//important metrics for later use--these do not change while the program
+		//is running, and storing these values saves time and improves code legibility.
 		elevatorWidth = imgElevatorDoorsOpen.getWidth();
 		elevatorHeight = imgElevatorDoorsOpen.getHeight();
 		elevatorShaftWidth = imgElevatorShaft.getWidth();
@@ -101,9 +114,13 @@ class ElevatorGUI extends Container implements MouseListener
 
 		this.setSize(windowWidth, windowHeight);
 
-		//Now, set up the Timer which will automatically redraw
+		//Set up the array of booleans that keeps track of whether each elevator's
+		//panel's window is showing. When the program starts, none of the windows are open.
+		panelIsOpen = new boolean[ElevatorSystem.getNumberOfElevators()];
+		Arrays.fill(panelIsOpen, false);
+		
+		//Finally, set up the Timer which will automatically redraw
 		//the GUI every REPAINT_FREQUENCY milliseconds.
-
 		new Timer(REPAINT_FREQUENCY, new RepaintActionHandler(this)).start();
 	}
 
@@ -170,9 +187,19 @@ class ElevatorGUI extends Container implements MouseListener
 
 		if (mouseX >= 0 && mouseX < ElevatorSystem.getNumberOfElevators())
 		{
-			new PanelView();
+			whichPanel = mouseX;
+			if (!panelIsOpen[whichPanel])
+			{
+				/*
+				 * Opens a window showing the selected elevator's panel
+				 * and takes note of the fact that the window is open--
+				 * therefore, ElevatorGUI will not open more than one window
+				 * representing the same elevator's panel.
+				 */
+				new PanelView(mouseX);
+				panelIsOpen[whichPanel] = true;
+			}
 		}
-
 	}
 
 	@Override
@@ -197,19 +224,19 @@ class ElevatorGUI extends Container implements MouseListener
 		private int	which;
 		private int[]	x;
 		private int[]	y;
-		
-		int panelWindowWidth = ElevatorSystem.getNumberOfElevators() * imgPanel.getWidth();
-		
-		
-		public PanelView()
+
+		public PanelView(int whichElevator)
 		{
-			setSize(panelWindowWidth, imgPanel.getHeight());
+			which = whichElevator;
+
+			setTitle("Elevator "+(which+1));
+			setSize(imgPanel.getWidth(), imgPanel.getHeight());
 			setResizable(false);
 			setVisible(true);
-			
+
 			x = new int[ElevatorSystem.getNumberOfFloors()];
 			y = new int[ElevatorSystem.getNumberOfFloors()];
-		
+
 			//First, calculate the number of columns needed to fit in a button for each floor.
 			int numberOfColumns = (ElevatorSystem.getNumberOfFloors() * (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING)) / imgPanel.getHeight();
 			numberOfColumns++;
@@ -225,59 +252,61 @@ class ElevatorGUI extends Container implements MouseListener
 
 				x[buttonToDraw] = (imgPanel.getWidth() * currentColumn) / (numberOfColumns + 1);
 				x[buttonToDraw] -= imgButtonOn.getWidth() / 2; //adjust for width of button
+
 				y[buttonToDraw] = (imgPanel.getHeight() - ( (buttonToDraw % buttonsPerColumn) + 1) * (imgButtonOn.getHeight() + PANEL_VERTICAL_BUTTON_SPACING));
-}
-			new Timer(PANEL_REPAINT_FREQUENCY, new RepaintActionHandler(this)).start();
+			}
+
+			/*
+			 * Adds a window listener that will notify ElevatorGUI
+			 * when this window is closed.
+			 */
+			addWindowListener(new WindowAdapter()
+			{
+				@Override
+				public void windowClosing(WindowEvent e)
+				{
+					ElevatorGUI.panelIsOpen[which] = false;
+				}
+			});
 			
+			new Timer(PANEL_REPAINT_FREQUENCY, new RepaintActionHandler(this)).start();
 		}
 
 		@Override
 		public void paint(Graphics g)
 		{
-			for(int i = 0; i < ElevatorSystem.getNumberOfElevators(); i++)
+			//Draw the background image.
+			g.drawImage(imgPanel, 0, 0, null);
+
+			//Font used to draw the numerals. Font.SANS_SERIF is part of the JDK.
+			g.setFont(new Font(Font.SANS_SERIF,Font.BOLD,15));
+
+			/*
+			 * The buttons in the elevator are drawn one-by-one, from bottom to top:
+			 * the first floor is at the bottom of the panel. Should one column be required,
+			 * the panel is divided in two, and the buttons are drawn along the median.
+			 * Should two columns be required, the panel is divided into thirds, with
+			 * the buttons lying along the two medians, etc.
+			 */
+
+			for(int buttonToDraw = 0; buttonToDraw < ElevatorSystem.getNumberOfFloors(); buttonToDraw++)
 			{
-				//Draw the background image.
-				g.drawImage(imgPanel, (i)*200, 0, null);
-			
-				//Draw lines separating the panels
-				g.setColor(Color.BLACK);	
-				g.drawLine((i)*200, 0, (i)*200, getHeight());
-			
-				//Font used to draw the numerals. Font.SANS_SERIF is part of the JDK.
-				g.setFont(new Font(Font.SANS_SERIF,Font.BOLD,15));
-
-				/*
-				 * The buttons in the elevator are drawn one-by-one, from bottom to top:
-				 * the first floor is at the bottom of the panel. Should one column be required,
-				 * the panel is divided in two, and the buttons are drawn along the median.
-				 * Should two columns be required, the panel is divided into thirds, with
-				 * the buttons lying along the two medians, etc.
-				 */
-
-				for(int buttonToDraw = 0; buttonToDraw < ElevatorSystem.getNumberOfFloors(); buttonToDraw++)
+				if (ElevatorSystem.getElevator(which).getLights()[buttonToDraw] == true)
 				{
-					if (ElevatorSystem.getElevator(i).getLights()[buttonToDraw] == true)
-					{
-						g.drawImage(imgButtonOn, x[buttonToDraw] + ((i)*200), y[buttonToDraw], null);
-						g.setColor(Color.RED);
-						g.drawString(String.valueOf(buttonToDraw+1), x[buttonToDraw]+LABEL_OFFSET_X + ((i)*200), y[buttonToDraw]+LABEL_OFFSET_Y);
-					}
-					else
-					{
-						g.drawImage(imgButtonOff, x[buttonToDraw] + ((i)*200), y[buttonToDraw], null);
-						g.setColor(Color.BLACK);
-						g.drawString(String.valueOf(buttonToDraw+1), x[buttonToDraw]+LABEL_OFFSET_X + ((i)*200), y[buttonToDraw]+LABEL_OFFSET_Y);
-					}				
-				} //for(...)
-			
-				//Draw label to specify the floor number
-				g.setColor(Color.BLACK);
-				g.setFont(new Font("SansSerif", Font.BOLD, 18));
-				g.drawString("Elevator: " + Integer.toString(i+1), 55+(i*imgPanel.getWidth()), 50);
-			
-			}
+					g.drawImage(imgButtonOn, x[buttonToDraw], y[buttonToDraw], null);
+					g.setColor(Color.RED);
+					g.drawString(String.valueOf(buttonToDraw+1), x[buttonToDraw]+LABEL_OFFSET_X, y[buttonToDraw]+LABEL_OFFSET_Y);
+				}
+				else
+				{
+					g.drawImage(imgButtonOff, x[buttonToDraw], y[buttonToDraw], null);
+					g.setColor(Color.BLACK);
+					g.drawString(String.valueOf(buttonToDraw+1), x[buttonToDraw]+LABEL_OFFSET_X, y[buttonToDraw]+LABEL_OFFSET_Y);
+				}				
+			} //for(...)
+
 		}//paint(Graphics)
-		
+
 	}//PanelView class
 
 }//ElevatorGUI class
