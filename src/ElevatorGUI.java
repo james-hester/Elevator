@@ -188,7 +188,28 @@ class ElevatorGUI extends Container implements MouseListener
 			Floor floorBeingDrawn = ElevatorSystem.getFloor(i);
 
 			g.drawLine(0, i*elevatorHeight, FLOOR_DISPLAY_WIDTH, i*elevatorHeight);
-			g.drawString(Arrays.toString(floorBeingDrawn.getGuests()), 10, getHeight() - (i * elevatorHeight) - 10);
+			g.setFont(new Font("SansSerif", Font.BOLD, 16));
+			g.drawString("Floor "+Integer.toString(i+1), 10,
+					getHeight() - ((i+1) * elevatorHeight) + 30);
+			//Calculate number of guests on floor.
+			int totalGuests = 0;
+			for(int oneDestination : floorBeingDrawn.getGuests())
+			{
+				totalGuests += oneDestination;
+			}
+			g.drawString("Guests on floor: "+Integer.toString(totalGuests), 10,
+					getHeight() - ((i+1) * elevatorHeight) + 50);
+			
+			int guestsGoingUp = 0;
+			for(int j = i; j < ElevatorSystem.getNumberOfFloors(); j++)
+			{
+				guestsGoingUp += floorBeingDrawn.getGuests()[j];
+			}
+			g.drawString("Guests going up: "+Integer.toString(guestsGoingUp), 10,
+					getHeight() - ((i+1) * elevatorHeight) + 70);
+			g.drawString("Guests going down: "+Integer.toString(totalGuests-guestsGoingUp), 10,
+					getHeight() - ((i+1) * elevatorHeight) + 90);
+
 		}
 	}
 
